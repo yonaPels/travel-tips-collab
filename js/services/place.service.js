@@ -1,44 +1,72 @@
-import { utilService } from '/storage.service.js'
+import { localStorageData } from './storage.service.js'
 import { storageService } from './async-storage.service.js'
+import { utilService } from './util.service.js'
 
 
 const PLACES_KEY = 'placesDB'
 
 
-// export const placeService={
-
-// }
+export const placeService = {
+    query,
+    get,
+    remove,
+    save,
+    getEmptyPlace,
+}
 
 _createPlaces()
 
-function _createPlaces(){
-    let Places = utilService.loadFromStorage(PET_KEY)
-    if (!Places || !Places.length) {
-        _createDemoPets()
+function query() {
+    return storageService.query(PLACES_KEY)
+        .then(places => { return places })
+}
+
+function get(placeId) {
+    return storageService.get(PLACES_KEY, placeId)
+}
+
+function remove(placeId) {
+    return storageService.remove(PLACES_KEY, placeId)
+}
+
+function save(place) {
+    if (place.id) {
+        return storageService.put(PLACES_KEY, place)
+    } else {
+        return storageService.post(PLACES_KEY, place)
     }
-
 }
 
-function _createDemoPets() {
-    const petNames = ['Bobi', 'Charli', 'Pinchi']
-    const petDescs = ['Bobi is an amazing dog', 'Charli is a curious cat', 'Just one look at Pinchi']
+function getEmptyPlace(name = '', lat = 0, lng = 0) {
+    return { id: '', name, lat, lng }
+}
 
-    const pets = petNames.map((petName, i) => {
-        const pet = _createPet(petName)
-        pet.desc = petDescs[i]
-        return pet
+function _createPlaces() {
+    let Places = localStorageData.loadFromStorage(PLACES_KEY)
+    if (!Places || !Places.length) {
+        _createDemoPlaces()
+    }
+}
+
+function _createDemoPlaces() {
+    const demoPlaces = [{ name: 'Greatplace', lat: 32.047104, lng: 34.832384 },
+    { name: 'Neveragain', lat: 32.047201, lng: 34.832581 }]
+
+
+    const places = demoPlaces.map((place) => {
+        const currPlace = _createPlace(place.name, place.lat, place.lng)
+        return currPlace
     })
-
-    utilService.saveToStorage(PET_KEY, pets)
+    localStorageData.saveToStorage(PLACES_KEY, places)
+}
+function _createPlace(name, lat, lng) {
+    return {
+        id: utilService.makeId(),
+        name,
+        lat,
+        lng,
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
+    }
 }
 
-function _createPlace(name,lat,ing) {
-    id = utilService.makeId()
-    name = name || utilService.randomPetName(pet.type)
-    type = utilService.randomPetType()
-    birth = utilService.randomPastTime()
-    
-}
-
-// { name: 'Greatplace', lat: 32.047104, lng: 34.832384 }, 
-//     { name: 'Neveragain', lat: 32.047201, lng: 34.832581 }

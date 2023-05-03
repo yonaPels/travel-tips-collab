@@ -1,7 +1,9 @@
+
 export const mapService = {
     initMap,
     addMarker,
-    panTo
+    panTo,
+    goToPos
 }
 
 
@@ -19,9 +21,25 @@ function initMap(lat = 32.0749831, lng = 34.9120554) {
                 center: { lat, lng },
                 zoom: 15
             })
+            
+            // Configure the click listener.
+            gMap.addListener("click", (mapsMouseEvent) => {
+               
+             getClickdPos(JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2))
+                    
+            })
             console.log('Map!', gMap)
         })
 }
+
+function goToPos(lat,lng){
+   return gMap.center={lat,lng}
+}
+
+function getClickdPos(pos){
+console.log(pos)
+}
+    
 
 function addMarker(loc) {
     var marker = new google.maps.Marker({

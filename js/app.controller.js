@@ -1,12 +1,15 @@
 import { locService } from './services/loc.service.js'
 import { mapService } from './services/map.service.js'
-// import { placeService } from './services/place.service.js'
+import { placeService } from './services/place.service.js'
 
 window.onload = onInit
 window.onAddMarker = onAddMarker
 window.onPanTo = onPanTo
 window.onGetLocs = onGetLocs
 window.onGetUserPos = onGetUserPos
+window.onSearch = onSearch
+window.onDelete = onDelete
+window.onGoToPos = onGoToPos
 
 function onInit() {
     mapService.initMap()
@@ -14,8 +17,45 @@ function onInit() {
             console.log('Map is ready')
         })
         .catch(() => console.log('Error: cannot init map'))
+    placeService.query()
+        .then((places) => renderplaces(places))
 }
 
+function onSearch(ev) {
+    ev.preventDefault()
+    const input = document.querySelector('.search')
+    let elValue = ev.target.value
+    console.log(elValue)
+
+}
+
+function renderplaces(places) {
+    console.log(places)
+    const strHTML = places.map(place =>
+        `
+        <div>
+        name:${place.name}
+        lat:${place.lat}
+        lng:${place.lng}
+        <div class="action">
+        <button class="go" onclick="onGoToPos(${place.lat, place.lng})">go</button>
+        <button class="delete" onclick="onDelete('${place.id}')">delete</button>
+        </div>
+        </div>
+        `)
+    document.querySelector('.locs').innerHTML = strHTML.join('')
+}
+
+function onGoToPos(lat, lng) {
+    // mapService.goToPos({pos})
+    console.log(lat, lng)
+}
+
+function onDelete(id) {
+    placeService.remove(id)
+        .then(() => placeService.query())
+        .then(places => renderplaces(places))
+}
 // This function provides a Promise API to the callback-based-api of getCurrentPosition
 function getPosition() {
     console.log('Getting Pos')
